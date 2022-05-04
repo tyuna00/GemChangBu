@@ -1,0 +1,65 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ObjectPush : MonoBehaviour
+{
+    public GameObject player;
+
+    public bool isMove;
+
+    Vector3 position;
+
+    Vector3 target;
+    PlayerAction playerAction;
+    Transform trans;
+    int numObjectHit;
+
+
+    void Awake()
+    {
+        playerAction = player.GetComponent<PlayerAction>();
+        trans = GetComponent<Transform>();
+
+        position = transform.position;
+        target = transform.position;
+    }
+
+    
+
+    void Update()//transform.position + playerAction.moveVec
+    {
+        Vector3 velo = Vector3.zero;
+        if (target - transform.position == new Vector3()) {
+            transform.position = Vector3.SmoothDamp(transform.position, target, ref velo, 0.03f);
+        }
+        else {
+            transform.position = Vector3.MoveTowards(transform.position, target, 0.07f);
+        }
+    }
+
+    public void Push()
+    {
+        if (numObjectHit < 2)
+            target += playerAction.moveVec;
+        else
+            ResetObject();
+    }
+
+    public void ResetObject()
+    {
+        transform.position = position;
+        target = position;
+    }
+
+    void FixedUpdate()
+    {
+        Debug.DrawRay(trans.position, playerAction.dirVec, new Color(0, 1, 0));
+
+        int mask = (1 << 8) + (1 << 9);
+
+        RaycastHit2D[] rayHit = Physics2D.RaycastAll(trans.position, playerAction.dirVec, 1, mask);
+        numObjectHit = rayHit.Length;
+    }
+}
