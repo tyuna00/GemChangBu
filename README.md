@@ -1,1 +1,1 @@
-# KHS-Game-Create-Club
+# 겜창동
