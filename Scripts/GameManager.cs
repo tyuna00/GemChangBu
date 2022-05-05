@@ -40,9 +40,10 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         StartCoroutine(FadeOut());
-        GameLoad();
+        //GameLoad();
         questText.text = questManager.CheckQuest();
         playerAction = player.GetComponent<PlayerAction>();
+        GameLoad();
     }
 
     void Update()
@@ -295,9 +296,18 @@ public class GameManager : MonoBehaviour
         //PlayerPrefs.Save();
 
         //menuSet.SetActive(false);
-        Debug.Log("ok");
 
-        useJson.CreateJsonFile("Assets/Scripts/Json", "ItemData", statusManager.inventory);
+        SaveData saveData = new SaveData(
+            player.transform.position.x, 
+            player.transform.position.y, 
+            questManager.questId, 
+            questManager.
+            questActionIndex, 
+            statusManager.
+            inventory
+            );
+
+        useJson.CreateJsonFile("Assets/Scripts/Json", "SaveData", saveData);
     }
 
     public void GameLoad()
@@ -310,11 +320,17 @@ public class GameManager : MonoBehaviour
         //int questId = PlayerPrefs.GetInt("QuestId");
         //int questActionIndex = PlayerPrefs.GetInt("QuestActionIndex");
 
-        //player.transform.position = new Vector3(x, y, 0);
-        //questManager.questId = questId;
-        //questManager.questActionIndex = questActionIndex;
-        //questManager.ControlObject();
 
+
+        var saveData = useJson.LoadJsonFile<SaveData>("Assets/Scripts/Json", "SaveData");
+
+
+        player.transform.position = new Vector3(saveData.positionX, saveData.positionY, 0);
+        playerAction.target.position = new Vector3(saveData.positionX, saveData.positionY, 0);
+        questManager.questId = saveData.questId;
+        questManager.questActionIndex = saveData.questActionIndex;
+        //인벤토리
+        questManager.ControlObject();
     }
 
     public void GoMainMenu()
