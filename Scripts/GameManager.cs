@@ -68,44 +68,44 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void Action(GameObject scanObj)                      //»óÈ£ÀÛ¿ë
+    public void Action(GameObject scanObj)                      //ìƒí˜¸ì‘ìš©
     {
         scanObject = scanObj;
         ObjData objData = scanObject.GetComponent<ObjData>();
         
-        //Äû½ºÆ® µµÁß ÇØ¾ßÇÒ °Í Ã¼Å©
+        //í€´ìŠ¤íŠ¸ ë„ì¤‘ í•´ì•¼í•  ê²ƒ ì²´í¬
         questManager.QuestAction();
         
 
         switch (objData.type)
         {
-            case ObjData.Type.Npc://´ëÈ­ ÃÊ»óÈ­ ÀÖÀ½
+            case ObjData.Type.Npc://ëŒ€í™” ì´ˆìƒí™” ìˆìŒ
                 Talk(objData.id, true);
                 talkPanel.SetBool("isShow", isAction);
                 break;
 
-            case ObjData.Type.NoneNpc://´ëÈ­ ÃÊ»óÈ­ ¾øÀ½
+            case ObjData.Type.NoneNpc://ëŒ€í™” ì´ˆìƒí™” ì—†ìŒ
                 Talk(objData.id, false);
                 talkPanel.SetBool("isShow", isAction);
                 break;
 
-            case ObjData.Type.MovingBox://¹Ú½º ¹Ğ±â
+            case ObjData.Type.MovingBox://ë°•ìŠ¤ ë°€ê¸°
                 PushBox(scanObj);
                 break;
 
-            case ObjData.Type.Portal://Æ÷Å» ÀÌ¿ë
+            case ObjData.Type.Portal://í¬íƒˆ ì´ìš©
                 UsePortal(scanObject, objData.id);
                 break;
 
-            case ObjData.Type.Item ://¾ÆÀÌÅÛ ÁİÁİ
-                pickUpItem(scanObj);
+            case ObjData.Type.Item ://ì•„ì´í…œ ì¤ì¤
+                PickUpItem(scanObj);
                 break;
 
-            case ObjData.Type.Enemy://ÀüÅõ
+            case ObjData.Type.Enemy://ì „íˆ¬
                 Fight();
                 break;
 
-            case ObjData.Type.InteractObj://±âÅ¸ »óÈ£ÀÛ¿ë
+            case ObjData.Type.InteractObj://ê¸°íƒ€ ìƒí˜¸ì‘ìš©
                 break;
         }
     }
@@ -133,13 +133,13 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if (isNpc) {                                        //ÃÊ»óÈ­ º¸ÀÌ±â
-            talk.SetMsg(talkData.Split(';')[0]);                                                 //´ëÈ­ °¡Á®¿À±â
+        if (isNpc) {                                        //ì´ˆìƒí™” ë³´ì´ê¸°
+            talk.SetMsg(talkData.Split(';')[0]);                                                 //ëŒ€í™” ê°€ì ¸ì˜¤ê¸°
 
-            portraitImg.sprite = talkManager.Getportrait(id, int.Parse(talkData.Split(';')[1]));    //ÃÊ»óÈ­ °¡Á®¿À±â
+            portraitImg.sprite = talkManager.Getportrait(id, int.Parse(talkData.Split(';')[1]));    //ì´ˆìƒí™” ê°€ì ¸ì˜¤ê¸°
             portraitImg.color = new Color(1, 1, 1, 1);
 
-            if (prevPortrait != portraitImg.sprite) {       //ÃÊ»óÈ­ ÀÌÆÑÆ®
+            if (prevPortrait != portraitImg.sprite) {       //ì´ˆìƒí™” ì´íŒ©íŠ¸
                 portraitAnim.SetTrigger("doNod");
                 prevPortrait = portraitImg.sprite;
             }
@@ -165,7 +165,7 @@ public class GameManager : MonoBehaviour
         objectPush.Push();
     }
 
-    void pickUpItem(GameObject scanObj)
+    void PickUpItem(GameObject scanObj)
     {
         if (isAction)
         {
@@ -185,9 +185,12 @@ public class GameManager : MonoBehaviour
         else
         {
             portraitImg.color = new Color(1, 1, 1, 0);
-            talk.SetMsg(scanObj.transform.GetComponent<ItemPickUp>().item.itemName + " È¹µæ Çß½À´Ï´Ù.");
+            talk.SetMsg(scanObj.transform.GetComponent<ItemPickUp>().item.itemName + " íšë“ í–ˆìŠµë‹ˆë‹¤.");
             isAction = true;
             talkPanel.SetBool("isShow", isAction);
+
+            saveData.eventNumber.Add(1);
+            saveData.eventObject.Add(scanObj.name);
         }
 
     }
@@ -287,51 +290,58 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void GameSave()                  //bulid ÇÏ´Â°÷¿¡ player setting     //ÀÌ°Å ¿Ü¿¡ ÀúÀåÇÒ²¨ ¸¹À½, Json ÀÌ¿ë ¿¹Á¤ÀÓ
+    #region ë°ì´í„° ì„¸ì´ë¸Œ ë¡œë“œ
+
+    SaveData saveData = new SaveData();
+
+    public void GameSave()
     {
-        //PlayerPrefs.SetFloat("playerX", player.transform.position.x);
-        //PlayerPrefs.SetFloat("playerY", player.transform.position.y);
-        //PlayerPrefs.SetInt("QuestId", questManager.questId);
-        //PlayerPrefs.SetInt("QuestActionIndex", questManager.questActionIndex);
-        //PlayerPrefs.Save();
+        menuSet.SetActive(false);
 
-        //menuSet.SetActive(false);
+        saveData.positionX = playerAction.target.position.x;
+        saveData.positionY = playerAction.target.position.y;
 
-        SaveData saveData = new SaveData(
-            player.transform.position.x, 
-            player.transform.position.y, 
-            questManager.questId, 
-            questManager.
-            questActionIndex, 
-            statusManager.
-            inventory
-            );
+        saveData.questId = questManager.questId;
+        saveData.questActionIndex = questManager.questActionIndex;
+
+        saveData.playtime = statusManager.playTime;
+
+        Slot[] slots = statusManager.GetSlots();
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (slots[i].item != null)
+            {
+                saveData.invenArrayNumber.Add(i);
+                saveData.invenItemName.Add(slots[i].item.itemName);
+                saveData.invenItemNumber.Add(slots[i].itemCount);
+            }
+        }
 
         useJson.CreateJsonFile("Assets/Scripts/Json", "SaveData", saveData);
     }
 
     public void GameLoad()
     {
-
-        //if (!PlayerPrefs.HasKey("PlayerX"))
-        //    return;
-        //float x = PlayerPrefs.GetFloat("PlayerX");
-        //float y = PlayerPrefs.GetFloat("PlayerY");
-        //int questId = PlayerPrefs.GetInt("QuestId");
-        //int questActionIndex = PlayerPrefs.GetInt("QuestActionIndex");
-
-
-
         var saveData = useJson.LoadJsonFile<SaveData>("Assets/Scripts/Json", "SaveData");
 
+        player.transform.position = new Vector3(saveData.positionX, saveData.positionY, 0);//í”Œë ˆì´ì–´
+        playerAction.target.position = new Vector3(saveData.positionX, saveData.positionY, 0);//í”Œë ˆì´ì–´ íƒ€ê²Ÿ
 
-        player.transform.position = new Vector3(saveData.positionX, saveData.positionY, 0);
-        playerAction.target.position = new Vector3(saveData.positionX, saveData.positionY, 0);
-        questManager.questId = saveData.questId;
-        questManager.questActionIndex = saveData.questActionIndex;
-        //ÀÎº¥Åä¸®
+        questManager.questId = saveData.questId;//í€˜ìŠ¤íŠ¸ ì•„ì´ë””
+        questManager.questActionIndex = saveData.questActionIndex;//í€˜ìŠ¤íŠ¸ ì•¡ì…˜
+
+        statusManager.playTime = saveData.playtime;
+
+        for (int i = 0; i < saveData.invenItemName.Count; i++)//ì¸ë²¤í† ë¦¬
+            statusManager.LoadToInven(saveData.invenArrayNumber[i], saveData.invenItemName[i], saveData.invenItemNumber[i]);
+
+        for (int i = 0; i < saveData.eventNumber.Count; i++)//ë¨¹ì€ ì•„ì´í…œ íŒŒê´´
+            Destroy(GameObject.Find(saveData.eventObject[i]).transform.gameObject);
+
         questManager.ControlObject();
     }
+
+    #endregion
 
     public void GoMainMenu()
     {
