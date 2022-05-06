@@ -5,25 +5,25 @@ using UnityEngine;
 using UnityEngine.UI;
 public class StatusManager : MonoBehaviour
 {
-    public static bool statusActivated = false;  // »óÅÂ Ã¢ È°¼ºÈ­ ¿©ºÎ. {true°¡ µÇ¸é Ä«¸Ş¶ó ¿òÁ÷ÀÓ°ú ´Ù¸¥ ÀÔ·ÂÀ» ¸·À» °ÍÀÌ´Ù.} << ¾Æ´Ô
+    public static bool statusActivated = false;  // ìƒíƒœ ì°½ í™œì„±í™” ì—¬ë¶€. {trueê°€ ë˜ë©´ ì¹´ë©”ë¼ ì›€ì§ì„ê³¼ ë‹¤ë¥¸ ì…ë ¥ì„ ë§‰ì„ ê²ƒì´ë‹¤.} << ì•„ë‹˜
 
-    [SerializeField] GameObject Status; // »óÅÂ Ã¢ ¿©´İ±â Á¦¾î
+    [SerializeField] GameObject Status; // ìƒíƒœ ì°½ ì—¬ë‹«ê¸° ì œì–´
 
-    [SerializeField] Text PrintSpecialItem;  // Æ¯¼ö ¾ÆÀÌÅÛ Ãâ·Â Ã¢
-    [SerializeField] Text PrintQuestItem;  // Äù½ºÆ® ¾ÆÀÌÅÛ Ãâ·Â Ã¢
+    [SerializeField] Text PrintSpecialItem;  // íŠ¹ìˆ˜ ì•„ì´í…œ ì¶œë ¥ ì°½
+    [SerializeField] Text PrintQuestItem;  // í€˜ìŠ¤íŠ¸ ì•„ì´í…œ ì¶œë ¥ ì°½
 
-    [SerializeField] RectTransform PrintItemRect;  // Äù½ºÆ® ¾ÆÀÌÅÛ Ãâ·Â Ã¢ À§Ä¡
+    [SerializeField] RectTransform PrintItemRect;  // í€˜ìŠ¤íŠ¸ ì•„ì´í…œ ì¶œë ¥ ì°½ ìœ„ì¹˜
 
-    [SerializeField] Text PrintEtc;  // ±âÅ¸ Ãâ·Â Ã¢
+    [SerializeField] Text PrintEtc;  // ê¸°íƒ€ ì¶œë ¥ ì°½
 
-    public Slot[] inventory;  // ½½·Ôµé ¹è¿­
+    public Slot[] inventory;  // ìŠ¬ë¡¯ë“¤ ë°°ì—´
 
     float playTime;
     int h = 0;
     int m = 0;
     int s = 0;
 
-    void Start()
+    void Awake()
     {
         inventory = new Slot[5];
 
@@ -41,14 +41,9 @@ public class StatusManager : MonoBehaviour
         
     }
 
+    #region ìƒíƒœì°½
 
-
-
-
-
-    ///////////////////////////////////»óÅÂÃ¢
-
-    private void TryOpenInventory() //»óÅÂÃ¢ ¿©´İ±â
+    private void TryOpenInventory() //ìƒíƒœì°½ ì—¬ë‹«ê¸°
     {
         if (Input.GetKeyDown(KeyCode.I))
         {
@@ -62,49 +57,57 @@ public class StatusManager : MonoBehaviour
         }
     }
 
-    private void OpenInventory() //»óÅÂÃ¢ ¿­±â/
+    private void OpenInventory() //ìƒíƒœì°½ ì—´ê¸°/
     {
         Status.SetActive(true);
     }
 
-    private void CloseInventory() //»óÅÂÃ¢ ´İ±â/
+    private void CloseInventory() //ìƒíƒœì°½ ë‹«ê¸°/
     {
         Status.SetActive(false);
     }
 
-    ///////////////////////////////////±âÅ¸ Ãâ·Â¹°
+    #endregion
+
+    #region ê¸°íƒ€ ì¶œë ¥ë¬¼
 
     void EtcPrint()
     {
         playTime += Time.deltaTime;
-        s = (int)Math.Truncate(playTime); ;
+        s = (int)Math.Truncate(playTime);
 
-        if (playTime >= 60)
+        if (s >= 60)
         {
-            playTime = 0;
-            m += 1;
+            m += (int)Math.Truncate((float)(s / 60));
+            s = (int)Math.Truncate((float)(s - (m * 60)));
         }
         if (m >= 60)
         {
-            m = 0;
-            h += 1;
+            h += (int)Math.Truncate((float)(m / 60));
+            m = (int)Math.Truncate((float)(m - (h * 60)));
         }
 
         
         PrintEtc.text = "Play Time : " + h + "H " + m + "M " + s + "S";
+    }
 
+    #endregion
+
+    #region ì¸ë²¤í† ë¦¬
+
+    public Slot[] GetSlots() { return inventory; }
+
+    public void LoadToInven(int _arrayNum, string _itemName, int _itemNum)//ì¸ë²¤í† ë¦¬ ë¡œë“œ
+    {
+        for (int i = 0; i < items.Length; i++)
+            if (items[i].itemName == _itemName) { 
+                inventory[_arrayNum].AddItem(items[i], _itemNum);
+                ItemPrint();//////////////////ëª¬ê°€ ì´ìƒí•¨...
+            }
 
     }
 
-
-
-
-
-
-    ///////////////////////////////////ÀÎº¥Åä¸®
-
-
-    Slot FindSlot(string _ItemName)  //¾ÆÀÌÅÛ ½½·Ô Ã£±â
+    Slot FindSlot(string _ItemName)  //ì•„ì´í…œ ìŠ¬ë¡¯ ì°¾ê¸°
     {
         for (int i = 0; i < inventory.Length; i++)
         {
@@ -119,7 +122,7 @@ public class StatusManager : MonoBehaviour
         return null;
     }
 
-    void ItemPrint() //¾ÆÀÌÅÛ Ãâ·Â
+    void ItemPrint() //ì•„ì´í…œ ì¶œë ¥
     {
         string _printSpecialText = "";
         string _printQuestItemText = "";
@@ -136,52 +139,52 @@ public class StatusManager : MonoBehaviour
         PrintSpecialItem.text = _printSpecialText;
         PrintQuestItem.text = _printQuestItemText;
 
-        PrintItemRect.offsetMax = - new Vector2(0, 15 + PrintSpecialItem.preferredHeight); // ÄùšÀÆ® ÅÛ Ãâ·ÂÃ¢ À§Ä¡ Á¦¾î
+        PrintItemRect.offsetMax = - new Vector2(0, 15 + PrintSpecialItem.preferredHeight); // í€˜ìŠ½íŠ¸ í…œ ì¶œë ¥ì°½ ìœ„ì¹˜ ì œì–´
 
     }
 
-    public void AcquireItem(Item _item, int _count = 1) //¾ÆÀÌÅÛ Ãß°¡
+    public void AcquireItem(Item _item, int _count = 1) //ì•„ì´í…œ ì¶”ê°€
     {
         
         Slot _slot = FindSlot(_item.itemName);
 
-        if (_slot != null) //¾ÆÀÌÅÛ ÀÌ¹Ì °¡Áö°í ÀÖÀ¸¸é
+        if (_slot != null) //ì•„ì´í…œ ì´ë¯¸ ê°€ì§€ê³  ìˆìœ¼ë©´
         {
-            _slot.SetSlotCount(_count); //ÅÛ °¹¼ö Ãß°¡
+            _slot.SetSlotCount(_count); //í…œ ê°¯ìˆ˜ ì¶”ê°€
             ItemPrint();
             return;
         }
         
 
-        for (int i = 0; i < inventory.Length; i++) //¸¸¾à ¾ÆÀÌÅÛ ¾øÀ¸¸é
+        for (int i = 0; i < inventory.Length; i++) //ë§Œì•½ ì•„ì´í…œ ì—†ìœ¼ë©´
         {
-            if (inventory[i].item == null) //ºó ½½·ÔÀ» Ã£¾Æ¼­
+            if (inventory[i].item == null) //ë¹ˆ ìŠ¬ë¡¯ì„ ì°¾ì•„ì„œ
             {
-                inventory[i].AddItem(_item, _count); //ºó ½½·Ô¿¡ ÅÛ Ãß°¡
+                inventory[i].AddItem(_item, _count); //ë¹ˆ ìŠ¬ë¡¯ì— í…œ ì¶”ê°€
                 ItemPrint();
                 return;
             }
         }
     }
 
-    public bool ItemDelet(string _ItemName, int _count)  //¾ÆÀÌÅÛ »èÁ¦
+    public bool ItemDelet(string _ItemName, int _count)  //ì•„ì´í…œ ì‚­ì œ
     {
         Slot _slot = FindSlot(_ItemName);
-        if (_slot != null) //¾ÆÀÌÅÛ °¡Áö°íÀÖÀ¸¸é
+        if (_slot != null) //ì•„ì´í…œ ê°€ì§€ê³ ìˆìœ¼ë©´
         {
-            if (_slot.itemCount >= _count) //±× °¹¼ö°¡ ÇÊ¿ä·®º¸´Ù Å©¸é
+            if (_slot.itemCount >= _count) //ê·¸ ê°¯ìˆ˜ê°€ í•„ìš”ëŸ‰ë³´ë‹¤ í¬ë©´
             {
-                _slot.SetSlotCount(-1 * _count); //°¹¼ö »©°í
+                _slot.SetSlotCount(-1 * _count); //ê°¯ìˆ˜ ë¹¼ê³ 
                 ItemPrint();
-                return true; //true ¹İÈ¯
+                return true; //true ë°˜í™˜
             }
         }
-        return false; //¾ÆÀÌÅÛÀÌ ¾ø°Å³ª °¹¼ö°¡ ÀûÀ¸¸é fales
+        return false; //ì•„ì´í…œì´ ì—†ê±°ë‚˜ ê°¯ìˆ˜ê°€ ì ìœ¼ë©´ fales
 
     }
 
 
-    public int HaveItem(string _ItemName) //¾ÆÀÌÅÛÀ» ¸î°³ °¡Áö°í ÀÖ´Â°¡?
+    public int HaveItem(string _ItemName) //ì•„ì´í…œì„ ëª‡ê°œ ê°€ì§€ê³  ìˆëŠ”ê°€?
     {
         Slot _slot = FindSlot(_ItemName);
         if (_slot != null){
@@ -192,5 +195,5 @@ public class StatusManager : MonoBehaviour
         }
     }
 
-    ///////////////////////////////////
+    #endregion
 }
