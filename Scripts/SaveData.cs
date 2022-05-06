@@ -11,26 +11,12 @@ public class SaveData
     public int questId;
     public int questActionIndex;
 
-    //[SerializeField] List<string> items;
-    //[SerializeField] List<int> itemCount;
+    public float playtime;
 
-    public SaveData(float _positionX, float _positionY, int _questId, int _questActionIndex, Slot[] _inventory)
-    {
-        positionX = _positionX;
-        positionY = _positionY;
+    public List<int> invenArrayNumber = new List<int>();
+    public List<string> invenItemName = new List<string>();
+    public List<int> invenItemNumber = new List<int>();
 
-        questId = _questId;
-        questActionIndex = _questActionIndex;
-
-
-        //아이템 저장만 하면 됨
-        //foreach (var n in _inventory)
-        //{
-        //    if (n.itemCount != 0)
-        //    {
-        //        items.Add(n.item.name);
-        //        itemCount.Add(n.itemCount);
-        //    }
-        //}
-    }
+    public List<int> eventNumber = new List<int>();
+    public List<string> eventObject = new List<string>();
 }
