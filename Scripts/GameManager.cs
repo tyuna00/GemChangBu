@@ -34,16 +34,23 @@ public class GameManager : MonoBehaviour
 
     PlayerAction playerAction;
 
-
+    FadeEffect fadeEffect = FadeEffect.Instance;
+    SceneDataSaver sceneDataSaver = SceneDataSaver.Instance;
+    SceneLoader sceneLoader = SceneLoader.Instance;
 
 
     void Start()
     {
-        StartCoroutine(FadeOut());
-        //GameLoad();
-        questText.text = questManager.CheckQuest();
+
+
         playerAction = player.GetComponent<PlayerAction>();
-        GameLoad();
+
+        GameLoad(sceneDataSaver.loadNum);
+
+        questText.text = questManager.CheckQuest();
+
+        StartCoroutine(fadeEffect.FadeOut());
+
     }
 
     void Update()
@@ -189,7 +196,7 @@ public class GameManager : MonoBehaviour
             isAction = true;
             talkPanel.SetBool("isShow", isAction);
 
-            saveData.eventNumber.Add(1);
+            saveData.eventNumber.Add(1);//이벤트 추가
             saveData.eventObject.Add(scanObj.name);
         }
 
@@ -201,18 +208,19 @@ public class GameManager : MonoBehaviour
 
         PortalData portalData = scanObject.GetComponent<PortalData>();
         if (portalData.id <= questTalkIndex) {
-            StartCoroutine(FadeIn(() =>
+            StartCoroutine(fadeEffect.FadeIn(() =>
             {
                 playerAction.target.position = new Vector3(portalData.nextPortal.transform.position.x - 1, portalData.nextPortal.transform.position.y, 0);
                 player.transform.position = new Vector3(portalData.nextPortal.transform.position.x - 1, portalData.nextPortal.transform.position.y, 0);
                 questManager.QuestAction();
                 questManager.ControlObject();
-                StartCoroutine(FadeOut());
+                StartCoroutine(fadeEffect.FadeOut());
             }));
 
         }
     }
 
+    
     public void GameOver(string dingMsg)
     {
         GameOverSet.SetActive(true);
@@ -222,70 +230,16 @@ public class GameManager : MonoBehaviour
         isDie = true;
     }
 
-    #region Fade Effect
-
-    [SerializeField] GameObject FadeSet;
-    float time = 0f;
-    float F_time = 1f;
-
-    IEnumerator FadeIn(System.Action action)
-    {
-        FadeSet.SetActive(true);
-        Image image = FadeSet.GetComponent<Image>();
-
-
-        Color alpha = image.color;
-
-
-        time = 0f;
-        while (alpha.a < 1f)
-        {
-            time += (Time.deltaTime / F_time) * 2f;
-            alpha.a = Mathf.Lerp(0, 1, time);
-            image.color = alpha;
-            yield return null;
-        }
-
-        action();
-        yield return null;
-    }
-    IEnumerator FadeOut()
-    {
-        FadeSet.SetActive(true);
-        Image image = FadeSet.GetComponent<Image>();
-        Color alpha = image.color;
-
-        yield return new WaitForSeconds(0.1f);
-
-        time = 0f;
-        while (alpha.a > 0f)
-        {
-
-            time += (Time.deltaTime / F_time) * 2f;
-            alpha.a = Mathf.Lerp(1, 0, time);
-            image.color = alpha;
-            yield return null;
-        }
-
-        FadeSet.SetActive(false);
-
-        //image.color = new Color(1, 1, 1, 0);
-
-
-        yield return null;
-    }
-    #endregion
-
     void GameReset()
     {
         isDie = false;
         talkPanel.SetBool("isShow", false);
         GameOverSet.SetActive(false);
-        StartCoroutine(FadeIn(() =>
+        StartCoroutine(fadeEffect.FadeIn(() =>
         {
             player.transform.position = new Vector3(0, 0, 0);
             playerAction.target.position = new Vector3(0.5f, 0.5f, 0);
-            StartCoroutine(FadeOut());
+            StartCoroutine(fadeEffect.FadeOut());
         }));
 
     }
@@ -317,12 +271,12 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        useJson.CreateJsonFile("Assets/Scripts/Json", "SaveData", saveData);
+        useJson.CreateJsonFile("Assets/Scripts/Json", "SaveData1", saveData);
     }
 
-    public void GameLoad()
+    public void GameLoad(int _saveNum)
     {
-        var saveData = useJson.LoadJsonFile<SaveData>("Assets/Scripts/Json", "SaveData");
+        var saveData = useJson.LoadJsonFile<SaveData>("Assets/Scripts/Json", "SaveData" + _saveNum);
 
         player.transform.position = new Vector3(saveData.positionX, saveData.positionY, 0);//플레이어
         playerAction.target.position = new Vector3(saveData.positionX, saveData.positionY, 0);//플레이어 타겟
@@ -345,9 +299,8 @@ public class GameManager : MonoBehaviour
 
     public void GoMainMenu()
     {
-        StartCoroutine(FadeIn( ()=> SceneManager.LoadScene("MainMenu") ));
+        StartCoroutine(fadeEffect.FadeIn( ()=> sceneLoader.LoadScene("MainMenu") ));
 
     }
-
 
 }
