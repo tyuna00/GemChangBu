@@ -26,23 +26,30 @@ public class ObjectPush : MonoBehaviour
         target = transform.position;
     }
 
-    
-
-    void Update()//transform.position + playerAction.moveVec
+   IEnumerator Move()
     {
-        Vector3 velo = Vector3.zero;
-        if (target - transform.position == new Vector3()) {
-            transform.position = Vector3.SmoothDamp(transform.position, target, ref velo, 0.03f);
+        while (Vector3.Distance(transform.position, target) == 0f)
+        {
+            Vector3 velo = Vector3.zero;
+            if (Vector3.Distance(transform.position, target) > 0.5f)
+            {
+                transform.position = Vector3.SmoothDamp(transform.position, target, ref velo, 0.03f);
+            }
+            else
+            {
+                transform.position = Vector3.MoveTowards(transform.position, target, 0.07f);
+            }
         }
-        else {
-            transform.position = Vector3.MoveTowards(transform.position, target, 0.07f);
-        }
+        yield return null;
     }
 
     public void Push()
     {
         if (numObjectHit < 2)
+        {
             target += playerAction.moveVec;
+            StartCoroutine(Move());
+        }
         else
             ResetObject();
     }
