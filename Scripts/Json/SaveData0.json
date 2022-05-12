@@ -1,0 +1,12 @@
+{
+    "positionX":0.5,
+    "positionY":0.5,
+    "questId":10,
+    "questActionIndex":0,
+    "playtime":0,
+    "invenArrayNumber":[],
+    "invenItemName":[],
+    "invenItemNumber":[],
+    "eventNumber":[],
+    "eventObject":[]
+}
