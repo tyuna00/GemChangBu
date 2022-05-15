@@ -26,21 +26,17 @@ public class ObjectPush : MonoBehaviour
         target = transform.position;
     }
 
-   IEnumerator Move()
+    void Update()//transform.position + playerAction.moveVec
     {
-        while (Vector3.Distance(transform.position, target) == 0f)
+        Vector3 velo = Vector3.zero;
+        if (Vector3.Distance(transform.position, target) > 0.5f)
         {
-            Vector3 velo = Vector3.zero;
-            if (Vector3.Distance(transform.position, target) > 0.5f)
-            {
-                transform.position = Vector3.SmoothDamp(transform.position, target, ref velo, 0.03f);
-            }
-            else
-            {
-                transform.position = Vector3.MoveTowards(transform.position, target, 0.07f);
-            }
+            transform.position = Vector3.SmoothDamp(transform.position, target, ref velo, 0.03f);
         }
-        yield return null;
+        else
+        {
+            transform.position = Vector3.MoveTowards(transform.position, target, 0.07f);
+        }
     }
 
     public void Push()
@@ -48,11 +44,11 @@ public class ObjectPush : MonoBehaviour
         if (numObjectHit < 2)
         {
             target += playerAction.moveVec;
-            StartCoroutine(Move());
         }
         else
             ResetObject();
     }
+
 
     public void ResetObject()
     {
